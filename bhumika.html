@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Journey to Success</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Poppins', sans-serif;
+            background: #f0f2f5;
+        }
+        .hero-bg {
+            background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
+                        url('https://images.unsplash.com/photo-1519834785169-98be25ec3f84?auto=format&fit=crop&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        .thought-bg {
+            background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
+                        url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        .action-bg {
+            background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
+                        url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        .habit-bg {
+            background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
+                        url('https://images.unsplash.com/photo-1506485338023-6ce5f36692df?auto=format&fit=crop&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        .character-bg {
+            background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)),
+                        url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+        }
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.5);
+            border-radius: 3px;
+        }
+        .typing-indicator::after {
+            content: '...';
+            animation: typing 1s infinite;
+        }
+        @keyframes typing {
+            0% { content: '.'; }
+            33% { content: '..'; }
+            66% { content: '...'; }
+        }
+        .schedule-input {
+            @apply border-2 border-gray-300 rounded p-2 w-full;
+        }
+        .envelope {
+            transition: transform 0.3s ease;
+        }
+        .envelope:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50" x-data="app()">
+    <!-- Main Page -->
+    <div x-show="currentPage === 'main'" class="min-h-screen hero-bg">
+        <div class="container mx-auto px-4 py-20">
+            <h1 class="text-5xl font-bold mb-6 text-center text-gray-800">REMAKING YOURSELF</h1>
+            <p class="text-xl text-center mb-12 text-gray-600">Shape your destiny, craft your future.</p>
+            <div class="text-center">
+                <button @click="currentPage = 'thought'" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full transition duration-300">
+                    Start Your Journey
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thought Page -->
+    <div x-show="currentPage === 'thought'" x-cloak class="min-h-screen thought-bg">
+        <div class="container mx-auto px-4 py-16">
+            <h1 class="text-4xl font-bold mb-8 text-center text-gray-800">THOUGHT</h1>
+            <div class="max-w-3xl mx-auto bg-white/90 shadow-lg p-8 rounded-lg mb-12">
+                <p class="text-xl italic text-center">
+                    "Thought? I have a million thoughts a day.<br>
+                    How powerful can they be?<br>
+                    A single thought has the potential to change the world."
+                </p>
+            </div>
+
+            <!-- Dream Chat Section -->
+            <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">Let's Discover Your Dream</h2>
+                <div class="chat-container bg-gray-50 p-4 rounded mb-4" x-ref="chatContainer">
+                    <template x-for="(message, index) in messages" :key="index">
+                        <div class="mb-4">
+                            <div :class="{
+                                'p-3 rounded-lg inline-block max-w-[80%]': true,
+                                'bg-blue-600 text-white': message.role === 'assistant',
+                                'bg-gray-200 text-gray-800 float-right': message.role === 'user'
+                            }">
+                                <span x-text="message.content"></span>
+                            </div>
+                            <div class="clear-both"></div>
+                        </div>
+                    </template>
+                    <div x-show="isTyping" class="typing-indicator bg-blue-600 text-white p-3 rounded-lg inline-block">
+                        Thinking
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" x-model="userInput" @keyup.enter="sendMessage" class="flex-1 p-2 border rounded" placeholder="Type your dream field (e.g., doctor, engineer, artist)...">
+                    <button @click="sendMessage" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        Send
+                    </button>
+                </div>
+            </div>
+
+            <!-- Personality Showcase -->
+            <div x-show="showPersonality" x-cloak class="max-w-2xl mx-auto mt-8 bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-2xl font-bold mb-4 text-gray-800">Inspiring Personality</h3>
+                <div class="flex flex-col md:flex-row items-center gap-4">
+                    <img :src="personality.image" :alt="personality.name" class="w-48 h-48 object-cover rounded-lg shadow">
+                    <div>
+                        <h4 class="text-xl font-bold" x-text="personality.name"></h4>
+                        <p class="text-gray-600 mt-2" x-text="personality.description"></p>
+                        <p class="text-gray-600 mt-2" x-text="personality.achievements"></p>
+                    </div>
+                </div>
+                <button @click="currentPage = 'action'" class="mt-6 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full mx-auto block">
+                    Next Step
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Page -->
+    <div x-show="currentPage === 'action'" x-cloak class="min-h-screen action-bg">
+        <div class="container mx-auto px-4 py-16">
+            <h1 class="text-4xl font-bold mb-8 text-center text-gray-800">ACTION</h1>
+            <div class="max-w-3xl mx-auto bg-white/90 shadow-lg p-8 rounded-lg mb-12">
+                <p class="text-xl italic text-center mb-8">
+                    "Action speaks louder than words"
+                </p>
+                <div class="prose max-w-none">
+                    <h3 class="text-2xl font-bold mb-4">The Importance of Action</h3>
+                    <p class="text-lg">
+                        Action is crucial for success as it transforms intentions into results. It builds momentum, fosters learning, 
+                        and boosts confidence while overcoming procrastination. Taking action seizes opportunities and inspires others 
+                        through initiative and determination. It aids in breaking bad habits and enhances a sense of accomplishment. 
+                        Moreover, it helps overcome fear and cultivates personal growth.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Daily Schedule Builder -->
+            <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold mb-6">Create Your Daily Schedule</h2>
+                <div class="space-y-4">
+                    <template x-for="(schedule, index) in schedules" :key="index">
+                        <div class="flex gap-4 items-center">
+                            <input type="time" x-model="schedule.time" class="schedule-input">
+                            <input type="text" x-model="schedule.activity" class="schedule-input" placeholder="Enter activity">
+                            <button @click="removeSchedule(index)" class="text-red-500 hover:text-red-700">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </template>
+                    <button @click="addSchedule" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        Add Time Slot
+                    </button>
+                </div>
+                <button @click="saveSchedule" class="mt-6 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full mx-auto block">
+                    Save Schedule
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Habits Page -->
+    <div x-show="currentPage === 'habits'" x-cloak class="min-h-screen habit-bg">
+        <div class="container mx-auto px-4 py-16">
+            <h1 class="text-4xl font-bold mb-8 text-center text-gray-800">HABITS</h1>
+            <div class="max-w-3xl mx-auto bg-white/90 shadow-lg p-8 rounded-lg mb-12">
+                <p class="text-xl italic text-center mb-8">
+                    "We are what we repeatedly do. Excellence, then, is not an act, but a habit."
+                </p>
+                <div class="prose max-w-none mb-8">
+                    <h3 class="text-2xl font-bold mb-4">The Power of Habits</h3>
+                    <p class="text-lg">
+                        Habits play a crucial role in shaping our daily lives and overall success. They automate routine tasks, 
+                        saving time and mental energy for more important decisions. Positive habits, such as exercising or reading, 
+                        contribute to long-term health, growth, and productivity. On the other hand, negative habits can hinder 
+                        progress and lead to undesirable outcomes. By consciously building good habits, we can achieve goals more 
+                        effectively and lead a balanced, fulfilling life.
+                    </p>
+                </div>
+
+                <!-- Habit Transformer -->
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-xl font-bold mb-4">List Your Bad Habits</h4>
+                        <textarea x-model="badHabits" class="w-full p-3 border rounded" rows="3" placeholder="Enter your bad habits..."></textarea>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-4">Replace with Good Habits</h4>
+                        <textarea x-model="goodHabits" class="w-full p-3 border rounded" rows="3" placeholder="Enter replacement good habits..."></textarea>
+                    </div>
+                </div>
+                <button @click="currentPage = 'character'" class="mt-6 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-full mx-auto block">
+                    Next Step
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Character Page -->
+    <div x-show="currentPage === 'character'" x-cloak class="min-h-screen character-bg">
+        <div class="container mx-auto px-4 py-16">
+            <h1 class="text-4xl font-bold mb-8 text-center text-gray-800">CHARACTER</h1>
+            <div class="max-w-3xl mx-auto bg-white/90 shadow-lg p-8 rounded-lg mb-12">
+                <p class="text-xl italic text-center mb-12">
+                    "Knowledge will give you power, but character respect"
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <template x-for="(quote, index) in characterQuotes" :key="index">
+                        <div class="envelope bg-white p-6 rounded-lg shadow-lg cursor-pointer" @click="showQuote(index)">
+                            <div class="text-center">
+                                <i class="bi bi-envelope-fill text-4xl text-blue-600"></i>
+                                <p class="mt-2 text-gray-600">Wisdom #<span x-text="index + 1"></span></p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function app() {
+            return {
+                currentPage: 'main',
+                userInput: '',
+                messages: [
+                    {role: 'assistant', content: "What's your dream field? Tell me what interests you the most (e.g., doctor, scientist, dancer, artist)?"}
+                ],
+                isTyping: false,
+                showPersonality: false,
+                personality: {},
+                schedules: [
+                    { time: '06:00', activity: 'Wake up' },
+                    { time: '07:00', activity: 'Exercise' }
+                ],
+                badHabits: '',
+                goodHabits: '',
+                characterQuotes: [
+                    "You have the right to work, but never to the fruit of the work...",
+                    "We behold what we are, and we are what we behold.",
+                    "It is better to live your own destiny imperfectly...",
+                    "The power of God is with you at all times...",
+                    "Man is made by his belief. As he believes, so he is!",
+                    "Neither in this world nor elsewhere is there any happiness...",
+                    "The wise man lets go of all results...",
+                    "He who has let go of hatred...",
+                    "For even if the greatest sinner worships me...",
+                    "Perform all thy actions with mind concentrated on the Divine..."
+                ],
+                
+                async sendMessage() {
+                    if (!this.userInput.trim()) return;
+                    
+                    this.messages.push({
+                        role: 'user',
+                        content: this.userInput
+                    });
+                    
+                    const userField = this.userInput.toLowerCase();
+                    this.userInput = '';
+                    this.isTyping = true;
+
+                    this.$nextTick(() => {
+                        this.$refs.chatContainer.scrollTop = this.$refs.chatContainer.scrollHeight;
+                    });
+
+                    try {
+                        const response = this.generatePersonalityInfo(userField);
+                        
+                        this.isTyping = false;
+                        this.messages.push({
+                            role: 'assistant',
+                            content: response.message
+                        });
+
+                        this.personality = response.personality;
+                        this.showPersonality = true;
+
+                    } catch (error) {
+                        this.isTyping = false;
+                        this.messages.push({
+                            role: 'assistant',
+                            content: "I apologize, but I'm having trouble processing that. Could you try again?"
+                        });
+                    }
+
+                    this.$nextTick(() => {
+                        this.$refs.chatContainer.scrollTop = this.$refs.chatContainer.scrollHeight;
+                    });
+                },
+
+                generatePersonalityInfo(field) {
+                    const personalities = {
+                        'dance': {
+                            name: "Michael Jackson",
+                            description: "Michael Joseph Jackson was an American singer, songwriter, dancer, and philanthropist. Dubbed the 'King of Pop,' he influenced music, dance, and fashion globally.",
+                            achievements: "Known for iconic moves like the moonwalk and being the best-selling solo music act of all time.",
+                            image: "https://i.ytimg.com/vi/8byZATkBKT4/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLCif_KeXToIt7TtHODxWWOg61GOzw"
+                        },
+                        'science': {
+                            name: "Dr. A.P.J. Abdul Kalam",
+                            description: "Indian aerospace scientist and the 11th president of India, known as the 'Missile Man of India.'",
+                            achievements: "Instrumental in India's missile development and the Pokhran-II nuclear tests.",
+                            image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQELRJNIDJxadkcbt9_NATcqHwCayKGYUoqwvwkjPgQKaMlcnwM"
+                        },
+                        'scientist': {
+                            name: "Dr. A.P.J. Abdul Kalam",
+                            description: "Indian aerospace scientist and the 11th president of India, known as the 'Missile Man of India.'",
+                            achievements: "Instrumental in India's missile development and the Pokhran-II nuclear tests.",
+                            image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQELRJNIDJxadkcbt9_NATcqHwCayKGYUoqwvwkjPgQKaMlcnwM"
+                        },
+
+                        'doctor': {
+                            name: "Dr. Naresh Trehan",
+                            description: "A world-renowned cardiovascular and cardiothoracic surgeon, Chairman of Medanta.",
+                            achievements: "Awarded the Padma Bhushan and Padma Shri. Performed over 48,000 successful heart surgeries.",
+                            image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-AH8Vj1GH399rYw6-K4kY-LfnApUuShE3h7lGrSLONSL6A1xC"
+                        },
+                        'biology': {
+                            name: "Dr. Naresh Trehan",
+                            description: "A world-renowned cardiovascular and cardiothoracic surgeon, Chairman of Medanta.",
+                            achievements: "Awarded the Padma Bhushan and Padma Shri. Performed over 48,000 successful heart surgeries.",
+                            image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-AH8Vj1GH399rYw6-K4kY-LfnApUuShE3h7lGrSLONSL6A1xC"
+                        },
+
+                        'art': {
+                            name: "Elizabeth Thompson (Lady Butler)",
+                            description: "British painter known for painting scenes from military campaigns.",
+                            achievements: "Famous for works like 'The Roll Call' and contributions to military art.",
+                            image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTXDnU2-CggK_2sGqrHe-0af26O2RQW-I2uiBai4sBieMPSaaJA"
+                        },
+                        'drawing': {
+                            name: "Elizabeth Thompson (Lady Butler)",
+                            description: "British painter known for painting scenes from military campaigns.",
+                            achievements: "Famous for works like 'The Roll Call' and contributions to military art.",
+                            image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTXDnU2-CggK_2sGqrHe-0af26O2RQW-I2uiBai4sBieMPSaaJA"
+                        },
+
+                        'singing': {
+                            name: "Shreya Ghoshal",
+                            description: "Indian singer known for her wide vocal range and versatility, regarded as one of the greatest vocalists of the Indian subcontinent.",
+                            achievements: "Recipient of numerous accolades, including five National Film Awards and seven Filmfare Awards.",
+                            image: "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQJujZCYTf8dlCqqNSkRx1ljUmmZo7_MjWwtSx6e9rqgsrGMUOC"
+                        },
+                        'engineer': {
+                            name: "Mokshagundam Visvesvaraya",
+                            description: "Distinguished Indian engineer, scholar, and statesman, known for his contributions to India's infrastructure and modernization.",
+                            achievements: "Played a pivotal role in the development of India's infrastructure.",
+                            image: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSMbPENIJv3fltdIvpK9vwcXCgFmGK_EqIRD1Enz24Cps90DrZI"
+                        }
+                    };
+
+                    let personalityInfo = personalities['doctor']; // default
+                    for (let key in personalities) {
+                        if (field.includes(key)) {
+                            personalityInfo = personalities[key];
+                            break;
+                        }
+                    }
+
+                    return {
+                        message: "That's an interesting choice! Let me introduce you to someone exceptional in this field.",
+                        personality: personalityInfo
+                    };
+                },
+
+                addSchedule() {
+                    this.schedules.push({ time: '', activity: '' });
+                },
+
+                removeSchedule(index) {
+                    this.schedules.splice(index, 1);
+                },
+
+                saveSchedule() {
+                    // Save logic here
+                    this.currentPage = 'habits';
+                },
+
+                showQuote(index) {
+                    alert(this.characterQuotes[index]);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
